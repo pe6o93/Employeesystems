@@ -14,9 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -46,6 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
+
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -59,7 +57,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/employee/{id}")
                 .access("@employeeService.checkIfBoss(#id) or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.DELETE, "/api/files/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/employee/{id}")
+                .access("@employeeService.checkIfDirector(#id) or hasRole('ROLE_ADMIN')")
+                .antMatchers(HttpMethod.DELETE, "/api/employee/{id}")
                 .access("@employeeService.checkIfDirector(#id) or hasRole('ROLE_ADMIN')")
                 .and()
                 .csrf().disable()

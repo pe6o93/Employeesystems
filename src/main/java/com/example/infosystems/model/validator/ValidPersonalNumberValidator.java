@@ -1,8 +1,8 @@
 package com.example.infosystems.model.validator;
 
-import com.example.infosystems.repository.EmployeeRepository;
 import com.example.infosystems.service.EmployeeService;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -12,13 +12,17 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class ValidPersonalNumberValidator implements ConstraintValidator<ValidPersonalNumber, String> {
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
+    private final String PERSONAL_NUMBER_REGEX = "[0-9]{10}$";
 
     @Override
-    public boolean isValid(String personalNumber, ConstraintValidatorContext constraintValidatorContext) {
-        if(!this.employeeRepository.findByEGN(personalNumber).isPresent()) {
-            Matcher matcher = Pattern.compile("[0-9]{10}$").matcher(personalNumber);
-            return matcher.find();
+    public boolean isValid(final String personalNumber,
+                           final ConstraintValidatorContext constraintValidatorContext) {
+        if (StringUtils.isNotBlank(personalNumber)) {
+            if (this.employeeService.isExistingEmployee(personalNumber)) {
+                Matcher matcher = Pattern.compile(PERSONAL_NUMBER_REGEX).matcher(personalNumber);
+                return matcher.find();
+            }
         }
         return false;
     }

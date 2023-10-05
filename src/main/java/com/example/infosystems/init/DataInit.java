@@ -17,7 +17,7 @@ public class DataInit implements CommandLineRunner {
 
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         this.directorateService.initDirectorates();
         this.departmentService.initDepartments();
         this.employeeService.initEmployees();

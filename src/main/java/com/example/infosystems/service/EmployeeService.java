@@ -29,6 +29,7 @@ public class EmployeeService {
     private final ModelMapper modelMapper;
     private final DirectorateRepository directorateRepository;
     private final DepartmentRepository departmentRepository;
+    private final FileService fileService;
 
     public EmployeeDTO findEmployeeByIdMapToDTO(Integer id) {
         EmployeeEntity employeeEntity = this.employeeRepository
@@ -52,7 +53,8 @@ public class EmployeeService {
 
 
 
-    public EmployeeDTO editEmployee(EmployeeDTO employeeDTO) {
+    public EmployeeDTO editEmployee(EmployeeDTO employeeDTO, Integer id) {
+        employeeDTO.setId(id);
         EmployeeEntity edited = mapEmployeeDTOtoEntity(employeeDTO);
         this.employeeRepository.save(edited);
         return employeeDTO;
@@ -79,7 +81,8 @@ public class EmployeeService {
     }
     private EmployeeEntity mapCreateEmployeeDTOtoEntity(CreateEmployeeDTO createEmployeeDTO) {
         EmployeeEntity entity = this.modelMapper.map(createEmployeeDTO, EmployeeEntity.class);
-        DepartmentEntity departmentEntity = this.departmentService.getDepartmentEntityByName(createEmployeeDTO.getDepartmentName());
+        DepartmentEntity departmentEntity =
+                this.departmentService.getDepartmentEntityByName(createEmployeeDTO.getDepartmentName());
         entity.setDepartment(departmentEntity);
         return entity;
     }
@@ -87,11 +90,13 @@ public class EmployeeService {
     @Transactional
     public boolean checkIfBoss(Integer id) {
         EmployeeEntity currentEmployee = getEmployeeEntityByPrincipal();
-        EmployeeEntity checkedEmployee = this.employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
+        EmployeeEntity checkedEmployee = this.employeeRepository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
-        if (checkedEmployee.getDepartment().getBoss() != null) {
+        EmployeeEntity boss = checkedEmployee.getDepartment().getBoss();
+        if (boss != null) {
             if (currentEmployee.getPosition().name().equals(PositionEnum.BOSS.name())) {
-                return checkedEmployee.getDepartment().getBoss().getId().equals(currentEmployee.getId());
+                return boss.getId().equals(currentEmployee.getId());
             }
         }
         return false;
@@ -101,12 +106,17 @@ public class EmployeeService {
 
         EmployeeEntity currentEmployee = getEmployeeEntityByPrincipal();
         if (currentEmployee.getPosition().equals(PositionEnum.DIRECTOR)) {
-            EmployeeEntity checkedEmployee = this.employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
+            EmployeeEntity checkedEmployee = this.employeeRepository.findById(id).
+                    orElseThrow(() -> new EmployeeNotFoundException(id));
             Integer directorateId = checkedEmployee.getDepartment().getDirectorate().getId();
             Integer directorId = this.directorateRepository.findById(directorateId).get().getDirector().getId();
             return currentEmployee.getId().equals(directorId);
         }
         return false;
+    }
+
+    public Boolean isExistingEmployee(String personalNumber){
+       return !this.employeeRepository.existsEmployeeEntityByEgn(personalNumber);
     }
 
     private EmployeeEntity getEmployeeEntityByPrincipal() {

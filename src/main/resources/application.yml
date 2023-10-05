@@ -26,4 +26,9 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+minio:
+ endpoint: http://192.168.1.7:9000
+ accesskey: ucApJg1LsjQYf8ew3Xb8
+ secretkey: Am0ndBAUTRc9PhQF4vgDWfBuXVCzFzPRi9luuiU6
+ expirationtime: 86400     #Expiration time in seconds - 60 * 60 * 24
 

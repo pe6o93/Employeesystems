@@ -2,8 +2,6 @@ package com.example.infosystems.service;
 
 import com.example.infosystems.model.dto.DepartmentDTO;
 import com.example.infosystems.model.entity.DepartmentEntity;
-import com.example.infosystems.model.entity.DirectorateEntity;
-import com.example.infosystems.model.entity.EmployeeEntity;
 import com.example.infosystems.repository.DepartmentRepository;
 import com.example.infosystems.repository.DirectorateRepository;
 import com.example.infosystems.repository.EmployeeRepository;

@@ -17,7 +17,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Intege
             "AND e.isActive IS TRUE ")
     List<EmployeeEntity> searchEmployee(String query);
 
-    Optional<EmployeeEntity> findByEGN(String EGN);
+    Boolean existsEmployeeEntityByEgn(String EGN);
 
     Optional<EmployeeEntity> findEmployeeEntityByUsername(String username);
 
